@@ -6,14 +6,7 @@ import './styles/app.scss';
 
 export const server = "https://nodejs-todo-vdzh.onrender.com/api/v1";
 
-export const Context = createContext({
-  isAuthenticated: false,
-  setIsAuthenticated: () => {},
-  loading: false,
-  setLoading: () => {},
-  user: {},
-  setUser: () => {},
-});
+export const Context = createContext({isAuthenticated: false});
 
 const AppWrapper = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

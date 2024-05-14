@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 
 const Header = () => {
     const { isAuthenticated, setIsAuthenticated, loading, setLoading } = useContext(Context); // Destructure isAuthenticated from context
-    console.log(isAuthenticated);
 
 
     const logoutHandler = async () => {
@@ -23,28 +22,28 @@ const Header = () => {
         }
         catch (error) {
             toast.error("some error");
-            console.log(error);
             setIsAuthenticated(true);
             setLoading(false);
         }
     };
+
     return (
         <nav className="header">
             <div>
                 <h2>TODO APP</h2>
             </div>
             <article>
-                <Link to="/">Home</Link>
-                <Link to="/profile">Profile</Link>
+                <Link to={"/"}>Home</Link>
+                <Link to={"/profile"}>Profile</Link>
                 {
                     isAuthenticated ? (
                         <button disabled={loading} onClick={logoutHandler} className='btn'>Logout</button>
                     ) : (
-                        <Link to="/login">Login</Link>
+                        <Link to={"/login"}>Login</Link>
                     )
                 }
                 {/* This line seems redundant, you may want to remove it */}
-            </article>
+            </article>  
         </nav>
     );
 }

@@ -26,7 +26,7 @@ function App() {
       setIsAuthenticated(false);
       setLoading(false); // Set loading to false after failed API call
     })
-  }, [setUser, setIsAuthenticated, setLoading]); // Include dependencies in the array
+  }, []); // Include dependencies in the array
 
   return (
     <Router>

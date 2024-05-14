@@ -1,14 +1,14 @@
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
-import { Context, server } from '../main';
-import toast from 'react-hot-toast'; // Make sure to import toast for displaying messages
-import Todoitem from '../components/Todoitem';
-import { Navigate } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { Context, server } from "../main";
+import { toast } from "react-hot-toast";
+import TodoItem from "../components/Todoitem";
+import { Navigate } from "react-router-dom";
 
 const Home = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false); // Initialize loading state as false
+  const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
@@ -16,19 +16,28 @@ const Home = () => {
 
   const updateHandler = async (id) => {
     try {
-      await axios.put(`${server}/task/${id}`, {}, { withCredentials: true });
-      setRefresh(true); // Trigger refresh
-      toast.success(`Task ID ${id} updated`);
+      const { data } = await axios.put(
+        `${server}/task/${id}`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      toast.success(data.message);
+      setRefresh((prev) => !prev);
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
-
   const deleteHandler = async (id) => {
     try {
-      await axios.delete(`${server}/task/${id}`, { withCredentials: true });
-      setRefresh(true); // Trigger refresh
-      toast.success(`Task ID ${id} deleted`);
+      const { data } = await axios.delete(`${server}/task/${id}`, {
+        withCredentials: true,
+      });
+
+      toast.success(data.message);
+      setRefresh((prev) => !prev);
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -38,21 +47,25 @@ const Home = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const { data } = await axios.post(`${server}/task/new`, {
-        title,
-        description
-      }, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json"
+      const { data } = await axios.post(
+        `${server}/task/new`,
+        {
+          title,
+          description,
         },
-      });
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       setTitle("");
       setDescription("");
       toast.success(data.message);
       setLoading(false);
-      setRefresh(true); // Trigger refresh
+      setRefresh((prev) => !prev);
     } catch (error) {
       toast.error(error.response.data.message);
       setLoading(false);
@@ -61,39 +74,56 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get(`${server}/task/my`, { withCredentials: true })
+      .get(`${server}/task/my`, {
+        withCredentials: true,
+      })
       .then((res) => {
         setTasks(res.data.tasks);
       })
       .catch((e) => {
         toast.error(e.response.data.message);
       });
-  }, [refresh]); // Refresh when refresh state changes
+  }, [refresh]);
 
   if (!isAuthenticated) return <Navigate to={"/login"} />;
 
   return (
     <div className="container">
-      <div className='login'>
+      <div className="login">
         <section>
           <form onSubmit={submitHandler}>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} type="text" placeholder='title' required />
-            <input value={description} onChange={(e) => setDescription(e.target.value)} type="text" placeholder='Description' required />
-            <button disabled={loading} type='submit'>Add Task</button>
+            <input
+              type="text"
+              placeholder="Title"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              required
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+
+            <button disabled={loading} type="submit">
+              Add Task
+            </button>
           </form>
         </section>
       </div>
 
       <section className="todosContainer">
-        {tasks.map((task) => (
-          <Todoitem
-            key={task._id}
-            title={task.title}
-            description={task.description}
-            isCompleted={task.isCompleted}
-            updateHandler={() => updateHandler(task._id)} // Pass the task ID to the handler
-            deleteHandler={() => deleteHandler(task._id)} // Pass the task ID to the handler
-            id={task._id}
+        {tasks.map((i) => (
+          <TodoItem
+            title={i.title}
+            description={i.description}
+            isCompleted={i.isCompleted}
+            updateHandler={updateHandler}
+            deleteHandler={deleteHandler}
+            id={i._id}
+            key={i._id}
           />
         ))}
       </section>
